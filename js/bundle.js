@@ -418,22 +418,12 @@
         let auth = null;
         let currentUser = null;
         let onAuthChangeCallback = null;
-        const ALLOWED_DOMAIN = 'montgomerybell.edu';
-
         function init() {
             if (typeof firebase === 'undefined' || !firebase.auth) { console.warn('Firebase Auth SDK not loaded'); return false; }
             auth = firebase.auth();
             auth.onAuthStateChanged(function(user) {
                 if (user) {
-                    const domain = (user.email || '').split('@')[1];
-                    if (domain === ALLOWED_DOMAIN) {
-                        currentUser = user;
-                    } else {
-                        console.warn('Access restricted to @' + ALLOWED_DOMAIN + ' accounts');
-                        signOut(); currentUser = null;
-                        if (onAuthChangeCallback) onAuthChangeCallback(null, 'Please use your @' + ALLOWED_DOMAIN + ' account');
-                        return;
-                    }
+                    currentUser = user;
                 } else { currentUser = null; }
                 if (onAuthChangeCallback) onAuthChangeCallback(currentUser);
             });
@@ -443,7 +433,6 @@
         function signInWithGoogle() {
             if (!auth) return Promise.reject(new Error('Auth not initialized'));
             const provider = new firebase.auth.GoogleAuthProvider();
-            provider.setCustomParameters({ hd: ALLOWED_DOMAIN });
             return auth.signInWithPopup(provider).then(r => r.user).catch(e => { console.error('Sign-in error:', e); throw e; });
         }
 
@@ -1735,7 +1724,7 @@
                 signInBtn.disabled = false;
                 signInBtn.innerHTML = '<span class="google-icon">G</span> Sign in with Google';
                 const hint = document.querySelector('.auth-hint');
-                if (hint) { hint.textContent = 'Use your @montgomerybell.edu account'; hint.style.color = ''; }
+                if (hint) { hint.textContent = 'Sign in with any Google account'; hint.style.color = ''; }
             }
         }
 
