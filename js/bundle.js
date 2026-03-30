@@ -1416,13 +1416,14 @@
         let puzzleQueue = [];
 
         const introStory = [
-            "The Montgomery Bell Academy Burkholder Wellness Center, after hours...",
-            "You sit down at the history bowl study table, stack of flashcards in hand.",
-            "Suddenly, the room dims. The stack of cards begins to glow.",
-            "They swirl into a vortex of light — nine eras of American history calling to you.",
-            "From the shores of the New World to the halls of Congress...",
-            "Nine eras. Nine medallions. One question: are you destined for greatness?",
-            "Master the American story. Collect all the medallions. Make history."
+            "Your AP US History exam is in two weeks. You are not okay.",
+            "Dr. Bailey looks up from his desk and offers a slow nod. \"Go for a climb,\" he says. That's it. Just that.",
+            "You figure it means nothing. But that afternoon, walking through the Burk, you pass the rock wall.",
+            "Something pulls you toward it. You start climbing.",
+            "Hand over hand, higher than you've ever gone — and then, at the very top, the wall gives way.",
+            "You fall through a swirling vortex of light, dates, and faces from another century.",
+            "Nine eras of American history stretch out before you, each one a world waiting to be explored.",
+            "The only way back... is through. Master the eras. Collect the medallions. Make history."
         ];
 
         function init() {
