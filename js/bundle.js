@@ -1243,8 +1243,6 @@
                 if (e.key === 'Enter') submitScoreToLeaderboard();
             });
 
-            document.getElementById('google-sign-in-btn').addEventListener('click', handleSignIn);
-            document.getElementById('sign-out-btn').addEventListener('click', handleSignOut);
         }
 
         function updateContinueButton() {
@@ -1686,61 +1684,7 @@
             });
         }
 
-        // ============================================
-        // AUTH FUNCTIONS
-        // ============================================
-        function handleSignIn() {
-            const signInBtn = document.getElementById('google-sign-in-btn');
-            signInBtn.disabled = true;
-            signInBtn.innerHTML = '<span class="google-icon">G</span> Signing in...';
-            Auth.signInWithGoogle().then(function() {
-                // handled by onAuthStateChanged
-            }).catch(function() {
-                signInBtn.disabled = false;
-                signInBtn.innerHTML = '<span class="google-icon">G</span> Sign in with Google';
-                const hint = document.querySelector('.auth-hint');
-                if (hint) { hint.textContent = 'Sign-in failed. Please try again.'; hint.style.color = 'var(--accent-red)'; }
-            });
-        }
-
-        function handleSignOut() {
-            Auth.signOut().then(function() { updateAuthUI(null); showScreen('title-screen'); });
-        }
-
-        function updateAuthUI(user) {
-            const signedOutSection = document.getElementById('auth-signed-out');
-            const signedInSection = document.getElementById('auth-signed-in');
-            const signInBtn = document.getElementById('google-sign-in-btn');
-            if (user) {
-                signedOutSection.classList.add('hidden');
-                signedInSection.classList.remove('hidden');
-                const displayName = Auth.getDisplayName();
-                document.getElementById('user-display-name').textContent = 'Welcome, ' + displayName + '!';
-                document.getElementById('map-user-name').textContent = displayName;
-                Game.syncWithCloud().then(function() { updateContinueButton(); updateMapState(); });
-            } else {
-                signedOutSection.classList.remove('hidden');
-                signedInSection.classList.add('hidden');
-                signInBtn.disabled = false;
-                signInBtn.innerHTML = '<span class="google-icon">G</span> Sign in with Google';
-                const hint = document.querySelector('.auth-hint');
-                if (hint) { hint.textContent = 'Sign in with any Google account'; hint.style.color = ''; }
-            }
-        }
-
-        function initAuth() {
-            if (Auth.init()) {
-                Auth.onAuthStateChanged(function(user, error) {
-                    if (error) {
-                        const hint = document.querySelector('.auth-hint');
-                        if (hint) { hint.textContent = error; hint.style.color = 'var(--accent-red)'; }
-                    }
-                    updateAuthUI(user);
-                });
-            }
-        }
-
-        return { init, showScreen, showMap, initAuth, updateAuthUI };
+        return { init, showScreen, showMap };
     })();
 
     // ============================================
@@ -1777,7 +1721,6 @@
         }
 
         UI.init();
-        UI.initAuth();
         UI.showScreen('title-screen');
 
         var topics = Puzzles.getTopicsWithPuzzles();
