@@ -1190,7 +1190,7 @@
         let puzzleQueue = [];
 
         const introStory = [
-            "The Bell School gymnasium, after hours...",
+            "The Montgomery Bell Academy Burkholder Wellness Center, after hours...",
             "You sit down at the history bowl study table, stack of flashcards in hand.",
             "Suddenly, the room dims. The stack of cards begins to glow.",
             "They swirl into a vortex of light — nine eras of American history calling to you.",
