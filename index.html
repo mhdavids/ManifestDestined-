@@ -151,6 +151,10 @@
             </div>
             <div id="puzzle-container" class="puzzle-body">
                 <div id="puzzle-stem" class="puzzle-question"></div>
+                <div id="puzzle-image" class="puzzle-image hidden">
+                    <img id="puzzle-img" src="" alt="" onerror="this.parentElement.classList.add('hidden')">
+                    <p id="puzzle-img-caption" class="img-caption"></p>
+                </div>
                 <div id="puzzle-choices" class="puzzle-options"></div>
                 <div id="puzzle-input-area" class="puzzle-input hidden">
                     <input type="text" id="numerical-answer" placeholder="Enter your answer">

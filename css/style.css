@@ -657,8 +657,29 @@ body {
 .puzzle-question {
     font-size: 1.1rem;
     line-height: 1.8;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     color: var(--text-primary);
+}
+
+.puzzle-image {
+    text-align: center;
+    margin-bottom: 1.25rem;
+}
+
+.puzzle-image img {
+    max-height: 200px;
+    max-width: 100%;
+    border-radius: 6px;
+    border: 1px solid var(--border-subtle);
+    object-fit: contain;
+}
+
+.img-caption {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    margin-top: 0.3rem;
+    font-style: italic;
+    opacity: 0.6;
 }
 
 .puzzle-options {
