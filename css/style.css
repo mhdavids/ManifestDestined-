@@ -1838,3 +1838,119 @@ body {
         max-width: 280px;
     }
 }
+
+/* ============================================
+   DR. BAILEY AVATAR
+   ============================================ */
+
+#dr-bailey-avatar {
+    position: absolute;
+    bottom: 72px;
+    right: 18px;
+    width: 90px;
+    cursor: pointer;
+    z-index: 200;
+    text-align: center;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    animation: bailey-idle 2.8s ease-in-out infinite;
+    transition: transform var(--transition-fast);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+#dr-bailey-avatar.bailey-visible {
+    display: flex;
+}
+
+#dr-bailey-avatar:hover {
+    animation-play-state: paused;
+    transform: scale(1.08) translateY(-4px);
+}
+
+#dr-bailey-avatar:active {
+    transform: scale(0.93);
+}
+
+#dr-bailey-avatar.bailey-laughing {
+    animation: bailey-laugh 0.4s ease-in-out 2;
+}
+
+.bailey-svg {
+    width: 90px;
+    height: auto;
+    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.6));
+}
+
+.bailey-nameplate {
+    font-family: var(--font-body);
+    font-size: 0.62rem;
+    font-weight: bold;
+    color: var(--text-highlight);
+    background: rgba(10, 5, 15, 0.75);
+    border: 1px solid var(--mba-yellow);
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin-top: 5px;
+    white-space: nowrap;
+    letter-spacing: 0.04em;
+}
+
+.bailey-bubble {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    right: 0;
+    width: 230px;
+    background: #fffef5;
+    border: 2px solid var(--mba-yellow);
+    border-radius: 14px;
+    padding: 11px 13px;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: #1a0e06;
+    line-height: 1.45;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+    text-align: left;
+    opacity: 0;
+    transform: translateY(8px) scale(0.88);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+    pointer-events: none;
+}
+
+/* Speech bubble tail pointing down-right */
+.bailey-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -11px;
+    right: 28px;
+    border: 6px solid transparent;
+    border-top-color: var(--mba-yellow);
+}
+.bailey-bubble::before {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    right: 30px;
+    border: 5px solid transparent;
+    border-top-color: #fffef5;
+    z-index: 1;
+}
+
+.bailey-bubble.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+@keyframes bailey-idle {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-7px); }
+}
+
+@keyframes bailey-laugh {
+    0%   { transform: rotate(0deg) scale(1); }
+    25%  { transform: rotate(-9deg) scale(1.05); }
+    75%  { transform: rotate(9deg) scale(1.05); }
+    100% { transform: rotate(0deg) scale(1); }
+}

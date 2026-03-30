@@ -206,6 +206,73 @@
             </div>
         </div>
 
+        <!-- Dr. Bailey Avatar -->
+        <div id="dr-bailey-avatar">
+            <div id="bailey-bubble" class="bailey-bubble">
+                <span id="bailey-joke"></span>
+            </div>
+            <svg class="bailey-svg" viewBox="0 0 120 185" xmlns="http://www.w3.org/2000/svg">
+                <!-- Suit body -->
+                <rect x="10" y="118" width="100" height="67" rx="10" fill="#2c3550"/>
+                <!-- Suit lapels (left & right) -->
+                <polygon points="60,118 40,132 40,162 60,148" fill="#1e2840"/>
+                <polygon points="60,118 80,132 80,162 60,148" fill="#1e2840"/>
+                <!-- White dress shirt -->
+                <rect x="53" y="118" width="14" height="46" fill="#f0ebe6"/>
+                <!-- Green tie with subtle pattern -->
+                <polygon points="57,120 63,120 66,155 60,163 54,155" fill="#3d6b3d"/>
+                <line x1="59" y1="122" x2="57" y2="150" stroke="#2a4a2a" stroke-width="0.8" opacity="0.7"/>
+                <line x1="61" y1="125" x2="62" y2="148" stroke="#2a4a2a" stroke-width="0.8" opacity="0.7"/>
+                <!-- Collar -->
+                <polygon points="60,115 48,125 57,125" fill="#f0ebe6"/>
+                <polygon points="60,115 72,125 63,125" fill="#f0ebe6"/>
+                <!-- Neck -->
+                <rect x="50" y="100" width="20" height="20" rx="4" fill="#c8a07a"/>
+                <!-- Head (lean oval) -->
+                <ellipse cx="60" cy="70" rx="27" ry="34" fill="#c8a07a"/>
+                <!-- Gray hair - top -->
+                <ellipse cx="60" cy="42" rx="25" ry="17" fill="#a0a0a0"/>
+                <!-- Gray hair - sides -->
+                <rect x="33" y="46" width="10" height="24" rx="5" fill="#a0a0a0"/>
+                <rect x="77" y="46" width="10" height="24" rx="5" fill="#a0a0a0"/>
+                <!-- Slightly darker top highlight -->
+                <ellipse cx="60" cy="42" rx="18" ry="11" fill="#8c8c8c"/>
+                <!-- Ears -->
+                <ellipse cx="33" cy="72" rx="5.5" ry="7" fill="#b89070"/>
+                <ellipse cx="87" cy="72" rx="5.5" ry="7" fill="#b89070"/>
+                <!-- Eye whites -->
+                <ellipse cx="47" cy="70" rx="7" ry="5.5" fill="white"/>
+                <ellipse cx="73" cy="70" rx="7" ry="5.5" fill="white"/>
+                <!-- Pupils/irises -->
+                <ellipse cx="47" cy="70" rx="4" ry="3.5" fill="#2a1a0a"/>
+                <ellipse cx="73" cy="70" rx="4" ry="3.5" fill="#2a1a0a"/>
+                <!-- Eye shine -->
+                <circle cx="48.5" cy="68.5" r="1.2" fill="white"/>
+                <circle cx="74.5" cy="68.5" r="1.2" fill="white"/>
+                <!-- Black rectangular glasses -->
+                <rect x="37" y="64" width="21" height="13" rx="2" fill="none" stroke="#111" stroke-width="2.5"/>
+                <rect x="62" y="64" width="21" height="13" rx="2" fill="none" stroke="#111" stroke-width="2.5"/>
+                <!-- Bridge -->
+                <line x1="58" y1="70" x2="62" y2="70" stroke="#111" stroke-width="2"/>
+                <!-- Temple arms -->
+                <line x1="37" y1="70" x2="32" y2="68" stroke="#111" stroke-width="2"/>
+                <line x1="83" y1="70" x2="88" y2="68" stroke="#111" stroke-width="2"/>
+                <!-- Nose -->
+                <ellipse cx="60" cy="81" rx="4" ry="3" fill="#b89070"/>
+                <line x1="57" y1="83" x2="55" y2="87" stroke="#a07060" stroke-width="1"/>
+                <line x1="63" y1="83" x2="65" y2="87" stroke="#a07060" stroke-width="1"/>
+                <!-- Friendly smile -->
+                <path d="M 50 92 Q 60 100 70 92" fill="none" stroke="#7a4030" stroke-width="2"/>
+                <!-- Smile cheek lines -->
+                <path d="M 48 89 Q 45 93 46 97" fill="none" stroke="#b08068" stroke-width="1"/>
+                <path d="M 72 89 Q 75 93 74 97" fill="none" stroke="#b08068" stroke-width="1"/>
+                <!-- Gray eyebrows -->
+                <path d="M 38 62 Q 47.5 57 57 62" fill="none" stroke="#767676" stroke-width="2.2"/>
+                <path d="M 63 62 Q 72.5 57 82 62" fill="none" stroke="#767676" stroke-width="2.2"/>
+            </svg>
+            <div class="bailey-nameplate">Dr. Bailey</div>
+        </div>
+
         <!-- Name Entry Modal -->
         <div id="name-modal" class="modal hidden">
             <div class="modal-content">
@@ -234,5 +301,72 @@
 
     <!-- Game scripts -->
     <script src="js/bundle.js"></script>
+
+    <!-- Dr. Bailey Avatar Logic -->
+    <script>
+    (function() {
+        const jokes = [
+            "Why did the Pilgrims' pants always fall down? Because they wore their buckles on their hats!",
+            "What did the Liberty Bell say when it cracked? I'm feeling a little rung out!",
+            "Why was Abraham Lincoln always so calm? He had a real handle on his stovepipe!",
+            "What did Paul Revere say when he finished his ride? That was a real horse-torical event!",
+            "Why did the colonists revolt? Because taxation without representation really... taxed their patience!",
+            "Why did George Washington cross the Delaware? He couldn't afford the bridge — no taxation without transportation!",
+            "What did Manifest Destiny say to the frontier? I'm just drawn to you!",
+            "What do you call a founding father who loves baking? Alexander Hamil-ton of rolls!",
+            "Why did Civil War soldiers love music? To keep the Union sound!",
+            "What do you call a homesick Pilgrim? May-FLOWER sick!",
+            "Why was the Missouri Compromise always tired? It kept drawing the line!",
+            "What did one colonist say at the Boston Tea Party? This party is so steep!",
+            "Why did Lewis and Clark keep getting lost? Google Maps hadn't been Manifest yet!",
+            "What did FDR say when he spilled his alphabet soup? There's nothing to fear but soup itself!",
+            "Why did the Erie Canal do so well in business? It had a great lock on the market!",
+            "What do you call a nervous colonial militia? The Minute-men-tally anxious!",
+            "Why did the transcontinental railroad succeed? It really nailed the final spike!",
+            "What was Ben Franklin's favorite season? Electric fall!",
+            "Why did the Continental Congress take so long? Too many Founding Fathers-in-law!",
+            "What did the Declaration of Independence say to the Constitution? You complete me — it's a more perfect union!",
+            "Why did Andrew Jackson always win at cards? He had a real deck-laration of dominance!",
+            "What do you call it when a historian tells a joke? A pun-damental truth!",
+            "Why couldn't the colonists play cards? Because the British kept taxing the deck!"
+        ];
+
+        // Shuffle jokes
+        for (let i = jokes.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [jokes[i], jokes[j]] = [jokes[j], jokes[i]];
+        }
+
+        let jokeIndex = 0;
+        let bubbleTimeout = null;
+
+        const avatar  = document.getElementById('dr-bailey-avatar');
+        const bubble  = document.getElementById('bailey-bubble');
+        const jokeEl  = document.getElementById('bailey-joke');
+        const mapScr  = document.getElementById('map-screen');
+
+        if (!avatar || !mapScr) return;
+
+        // Show/hide avatar based on map-screen active state
+        function syncVisibility() {
+            avatar.classList.toggle('bailey-visible', mapScr.classList.contains('active'));
+        }
+        syncVisibility();
+        new MutationObserver(syncVisibility).observe(mapScr, { attributes: true, attributeFilter: ['class'] });
+
+        // Click handler
+        avatar.addEventListener('click', function() {
+            jokeEl.textContent = jokes[jokeIndex];
+            jokeIndex = (jokeIndex + 1) % jokes.length;
+
+            bubble.classList.add('visible');
+            avatar.classList.add('bailey-laughing');
+            setTimeout(() => avatar.classList.remove('bailey-laughing'), 800);
+
+            clearTimeout(bubbleTimeout);
+            bubbleTimeout = setTimeout(() => bubble.classList.remove('visible'), 5500);
+        });
+    })();
+    </script>
 </body>
 </html>
