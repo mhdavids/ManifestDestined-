@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manifest Destined for Greatness - MBA AP US History Adventure</title>
+
+    <!-- Game styles -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Particle canvas overlay -->
+    <canvas id="particle-canvas"></canvas>
+
+    <div id="game-container">
+        <!-- Title Screen -->
+        <div id="title-screen" class="screen active">
+            <div class="title-content">
+                <h1 class="game-title">Manifest Destined for Greatness</h1>
+                <p class="subtitle">An MBA AP US History Adventure</p>
+                <div class="title-art">
+                    <div class="title-art-shape"></div>
+                </div>
+                <!-- Signed Out State -->
+                <div id="auth-signed-out" class="auth-section">
+                    <button id="google-sign-in-btn" class="menu-btn google-btn">
+                        <span class="google-icon">G</span> Sign in with Google
+                    </button>
+                    <p class="auth-hint">Use your @montgomerybell.edu account</p>
+                </div>
+                <!-- Signed In State -->
+                <div id="auth-signed-in" class="auth-section hidden">
+                    <div class="user-info">
+                        <span id="user-display-name">Student</span>
+                    </div>
+                    <div class="menu-buttons">
+                        <button id="new-game-btn" class="menu-btn">Begin Your Journey</button>
+                        <button id="continue-btn" class="menu-btn" disabled>Continue</button>
+                    </div>
+                    <button id="sign-out-btn" class="subtle-btn">Sign Out</button>
+                </div>
+                <p class="flavor-text">Master nine eras of American history. Collect all the medallions. Manifest your destiny.</p>
+            </div>
+        </div>
+
+        <!-- Intro Cutscene -->
+        <div id="intro-screen" class="screen">
+            <div class="cutscene-content">
+                <div id="intro-text" class="story-text"></div>
+                <button id="skip-intro-btn" class="subtle-btn">Skip</button>
+            </div>
+        </div>
+
+        <!-- Map Screen -->
+        <div id="map-screen" class="screen">
+            <div class="map-header">
+                <h2>Manifest Destined for Greatness</h2>
+                <div class="user-badge" id="map-user-badge">
+                    <span id="map-user-name">Student</span>
+                </div>
+                <div class="points-display">
+                    <span id="total-points">0</span> pts
+                </div>
+                <div class="rune-counter">
+                    <span id="runes-collected">0</span>/9 Medallions Collected
+                </div>
+            </div>
+            <div class="campus-map">
+                <div class="map-region" data-region="the-shore">
+                    <div class="region-icon">🌊</div>
+                    <div class="region-name">The Shore</div>
+                    <div class="region-status">Unit 1: Period 1, 1491–1607</div>
+                    <div class="rune-indicator"></div>
+                </div>
+                <div class="map-region locked" data-region="the-colony">
+                    <div class="region-icon">⚜️</div>
+                    <div class="region-name">The Colony</div>
+                    <div class="region-status">Unit 2: Period 2, 1607–1754</div>
+                    <div class="rune-indicator"></div>
+                </div>
+                <div class="map-region locked" data-region="the-tavern">
+                    <div class="region-icon">🍺</div>
+                    <div class="region-name">The Tavern</div>
+                    <div class="region-status">Unit 3: Period 3, 1754–1800</div>
+                    <div class="rune-indicator"></div>
+                </div>
+                <div class="map-region locked" data-region="the-frontier">
+                    <div class="region-icon">🌾</div>
+                    <div class="region-name">The Frontier</div>
+                    <div class="region-status">Unit 4: Period 4, 1800–1848</div>
+                    <div class="rune-indicator"></div>
+                </div>
+                <div class="map-region locked" data-region="the-divided-house">
+                    <div class="region-icon">⚔️</div>
+                    <div class="region-name">The Divided House</div>
+                    <div class="region-status">Unit 5: Period 5, 1844–1877</div>
+                    <div class="rune-indicator"></div>
+                </div>
+                <div class="map-region locked" data-region="the-factory">
+                    <div class="region-icon">⚙️</div>
+                    <div class="region-name">The Factory</div>
+                    <div class="region-status">Unit 6: Period 6, 1865–1898</div>
+                    <div class="rune-indicator"></div>
+                </div>
+                <div class="map-region locked" data-region="the-home-front">
+                    <div class="region-icon">🏠</div>
+                    <div class="region-name">The Home Front</div>
+                    <div class="region-status">Unit 7: Period 7, 1890–1945</div>
+                    <div class="rune-indicator"></div>
+                </div>
+                <div class="map-region locked" data-region="the-march">
+                    <div class="region-icon">✊</div>
+                    <div class="region-name">The March</div>
+                    <div class="region-status">Unit 8: Period 8, 1945–1980</div>
+                    <div class="rune-indicator"></div>
+                </div>
+                <div class="map-region locked" data-region="the-mall">
+                    <div class="region-icon">🌐</div>
+                    <div class="region-name">The Mall</div>
+                    <div class="region-status">Unit 9: Period 9, 1980–Present</div>
+                    <div class="rune-indicator"></div>
+                </div>
+            </div>
+            <div class="map-footer">
+                <button id="view-leaderboard-btn" class="menu-btn secondary">Leaderboard</button>
+                <button id="open-portal-btn" class="menu-btn hidden">Claim Victory</button>
+            </div>
+        </div>
+
+        <!-- Region Screen -->
+        <div id="region-screen" class="screen">
+            <div class="region-header">
+                <button id="back-to-map-btn" class="nav-btn">← Map</button>
+                <h2 id="region-title"></h2>
+                <div class="region-progress">
+                    <span id="topics-mastered">0</span>/<span id="topics-total">0</span> Topics Mastered
+                </div>
+            </div>
+            <div id="region-description" class="region-intro"></div>
+            <div id="topics-grid" class="topics-container"></div>
+        </div>
+
+        <!-- Lesson Screen -->
+        <div id="lesson-screen" class="screen">
+            <div class="lesson-header">
+                <button id="back-to-region-btn" class="nav-btn">← Back</button>
+                <h2 id="lesson-title"></h2>
+            </div>
+            <div id="lesson-content" class="lesson-body"></div>
+            <div class="lesson-footer">
+                <button id="start-practice-btn" class="menu-btn">Prove Your Mastery</button>
+            </div>
+        </div>
+
+        <!-- Puzzle Screen -->
+        <div id="puzzle-screen" class="screen">
+            <div class="puzzle-header">
+                <button id="back-to-lesson-btn" class="nav-btn">← Lesson</button>
+                <h2 id="puzzle-topic-title"></h2>
+                <div class="mastery-tracker">
+                    <span>Streak: </span>
+                    <div id="streak-dots" class="streak-container"></div>
+                </div>
+                <div class="points-earned" id="points-earned-display"></div>
+            </div>
+            <div id="puzzle-container" class="puzzle-body">
+                <div id="puzzle-stem" class="puzzle-question"></div>
+                <div id="puzzle-choices" class="puzzle-options"></div>
+                <div id="puzzle-input-area" class="puzzle-input hidden">
+                    <input type="text" id="numerical-answer" placeholder="Enter your answer">
+                    <button id="submit-numerical-btn" class="submit-btn">Submit</button>
+                </div>
+            </div>
+            <div id="puzzle-feedback" class="feedback-area hidden">
+                <div id="feedback-result"></div>
+                <div id="feedback-explanation"></div>
+                <button id="next-puzzle-btn" class="menu-btn">Continue</button>
+            </div>
+        </div>
+
+        <!-- Medallion Acquired Screen -->
+        <div id="rune-screen" class="screen">
+            <div class="rune-celebration">
+                <div class="rune-glow"></div>
+                <div id="rune-symbol" class="rune-display"></div>
+                <h2>Medallion Acquired!</h2>
+                <p id="rune-message"></p>
+                <button id="claim-rune-btn" class="menu-btn">Claim Medallion</button>
+            </div>
+        </div>
+
+        <!-- Victory Screen -->
+        <div id="victory-screen" class="screen">
+            <div class="victory-content">
+                <h1>You've Made History!</h1>
+                <div class="portal-animation"></div>
+                <p class="victory-text">You have mastered the nine eras of American history. Your dedication and wisdom have earned you the title of History Champion.</p>
+                <p class="completion-stats">
+                    <span id="total-problems-solved">0</span> problems solved<br>
+                    <span id="total-topics-mastered">0</span> topics mastered<br>
+                    <span id="victory-total-points">0</span> total points
+                </p>
+                <button id="submit-score-btn" class="menu-btn">Submit to Leaderboard</button>
+                <button id="credits-btn" class="menu-btn secondary">View Journey</button>
+            </div>
+        </div>
+
+        <!-- Leaderboard Screen -->
+        <div id="leaderboard-screen" class="screen">
+            <div class="leaderboard-header">
+                <button id="back-from-leaderboard" class="nav-btn">← Back</button>
+                <h2>Manifest Destined Leaderboard</h2>
+            </div>
+            <div id="leaderboard-list" class="leaderboard-container">
+                <div class="leaderboard-loading">Loading scores...</div>
+            </div>
+            <div class="leaderboard-footer">
+                <div class="your-score">Your score: <span id="leaderboard-your-score">0</span> pts</div>
+                <button id="leaderboard-submit-btn" class="menu-btn">Submit Your Score</button>
+            </div>
+        </div>
+
+        <!-- Name Entry Modal -->
+        <div id="name-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Enter Your Name</h3>
+                <p class="modal-subtitle">Your name will appear on the school leaderboard</p>
+                <input type="text" id="player-name-input" maxlength="15" placeholder="Your name">
+                <p id="name-error" class="error-text hidden"></p>
+                <div class="modal-buttons">
+                    <button id="cancel-name-btn" class="menu-btn secondary">Cancel</button>
+                    <button id="submit-name-btn" class="menu-btn">Submit Score</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio elements (optional, files not included) -->
+    <audio id="ambient-audio" loop></audio>
+    <audio id="sfx-correct"></audio>
+    <audio id="sfx-incorrect"></audio>
+    <audio id="sfx-rune"></audio>
+
+    <!-- Firebase SDK for Leaderboard and Auth -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
+
+    <!-- Game scripts -->
+    <script src="js/bundle.js"></script>
+</body>
+</html>
