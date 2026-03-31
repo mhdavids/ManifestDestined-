@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History Munchers – Manifest Destined</title>
+    <style>
+        :root {
+            --cardinal: #A30046;
+            --cordovan: #4A1326;
+            --silver:   #9D9FA2;
+            --gold:     #FFCF01;
+            --blue:     #4699C2;
+            --bg-dark:  #1a0a10;
+            --bg-med:   #2a1420;
+            --bg-panel: #2d1620;
+            --text:     #f0ebe6;
+            --text-dim: #9D9FA2;
+            --green:    #4a9b6a;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+        }
+
+        /* ── Header ──────────────────────────────────────────────────── */
+        #header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.55);
+            border-bottom: 1px solid var(--cordovan);
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        #header a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color .15s;
+        }
+        #header a:hover { color: var(--text); }
+
+        #game-title {
+            font-family: Georgia, serif;
+            font-size: 15px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: var(--gold);
+            text-transform: uppercase;
+        }
+
+        #hud {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+        #hud b { color: var(--text); }
+
+        /* ── Challenge banner ─────────────────────────────────────────── */
+        #challenge-banner {
+            padding: 9px 16px;
+            background: rgba(74, 19, 38, 0.65);
+            border-bottom: 1px solid rgba(163,0,70,.35);
+            text-align: center;
+            font-size: 14px;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+        #challenge-banner .pfx { color: var(--text-dim); }
+        #challenge-banner .lbl {
+            color: var(--gold);
+            font-weight: bold;
+            font-size: 15px;
+            letter-spacing: 1px;
+        }
+
+        /* ── Game area ────────────────────────────────────────────────── */
+        #game-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 12px;
+            overflow: hidden;
+        }
+
+        /* ── Flash overlay ────────────────────────────────────────────── */
+        #flash-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 40;
+            background: transparent;
+            transition: background-color .1s;
+        }
+
+        /* ── Grid ─────────────────────────────────────────────────────── */
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 4px;
+            padding: 10px;
+            background: rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px;
+        }
+
+        .cell {
+            width: 100px;
+            height: 56px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.13);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+            padding: 4px 5px;
+            line-height: 1.25;
+            background: #1e0d17;
+            color: var(--text);
+            overflow: hidden;
+        }
+
+        .cell.empty {
+            background: rgba(255,255,255,0.015);
+            border-color: rgba(255,255,255,0.04);
+        }
+
+        .cell.has-player {
+            box-shadow: 0 0 0 2px var(--green), 0 0 0 3px rgba(0,0,0,0.6);
+        }
+
+        .cell-text {
+            position: relative;
+            z-index: 1;
+            pointer-events: none;
+            word-break: break-word;
+        }
+
+        /* ── Player ───────────────────────────────────────────────────── */
+        .player-sprite {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            z-index: 3;
+        }
+        .player-sprite.blink {
+            animation: blink .3s step-end infinite;
+        }
+
+        /* ── Enemy (Dr. Bailey) ───────────────────────────────────────── */
+        .enemy-sprite {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+        }
+        .enemy-face {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background-image: url('Clay Bailey 2.jpg');
+            background-size: 230%;
+            background-position: 50% 6%;
+            border: 2px solid var(--cardinal);
+            box-shadow: 0 0 10px rgba(163,0,70,.9), 0 0 20px rgba(163,0,70,.4);
+            animation: bailey-bob 1.2s ease-in-out infinite;
+        }
+        @keyframes bailey-bob {
+            0%,100% { transform: scale(1);   }
+            50%      { transform: scale(1.08); }
+        }
+
+        /* ── Controls hint ────────────────────────────────────────────── */
+        #controls-hint {
+            color: rgba(255,255,255,.2);
+            font-size: 11px;
+            text-align: center;
+            letter-spacing: .3px;
+        }
+        #controls-hint b { color: rgba(255,255,255,.38); }
+
+        /* ── Start prompt ─────────────────────────────────────────────── */
+        #start-prompt {
+            color: rgba(255,255,255,.55);
+            font-size: 13px;
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+
+        /* ── Overlays ─────────────────────────────────────────────────── */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.82);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            padding: 16px;
+        }
+        .overlay-panel {
+            background: var(--bg-panel);
+            border: 1px solid rgba(255,255,255,.14);
+            border-radius: 18px;
+            padding: 36px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,.65);
+        }
+        .ov-emoji  { font-size: 52px; margin-bottom: 12px; }
+        .ov-title  { font-size: 22px; font-weight: bold; margin-bottom: 6px; font-family: Georgia, serif; }
+        .ov-sub    { color: var(--text-dim); font-size: 13px; margin-bottom: 4px; }
+        .ov-next   { color: var(--gold); font-weight: 700; font-size: 15px; margin-bottom: 20px; }
+        .ov-score  { color: var(--gold); font-weight: bold; font-size: 22px; margin-bottom: 24px; }
+
+        .btn {
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+            transition: filter .15s;
+            font-family: inherit;
+        }
+        .btn:hover { filter: brightness(1.18); }
+        .btn-green { background: #2e7d4a; color: #fff; }
+        .btn-dim   { background: rgba(255,255,255,.1); color: #fff; }
+        .btn-row   { display: flex; gap: 10px; justify-content: center; }
+
+        @keyframes blink {
+            0%,100% { opacity: .5; }
+            50%      { opacity: .1; }
+        }
+        @keyframes pulse {
+            0%,100% { opacity: .45; }
+            50%      { opacity: 1;   }
+        }
+    </style>
+</head>
+<body>
+
+<div id="flash-overlay"></div>
+
+<!-- Header -->
+<div id="header">
+    <a href="index.html">← Back to Game</a>
+    <div id="game-title">History Munchers</div>
+    <div id="hud">
+        <span>Score: <b id="hud-score">0</b></span>
+        <span id="hud-lives">❤️❤️❤️</span>
+        <span>Lv <b id="hud-level">1</b></span>
+    </div>
+</div>
+
+<!-- Challenge banner -->
+<div id="challenge-banner">
+    <span class="pfx" id="chal-pfx">Select the </span><span class="lbl" id="chal-lbl">ORIGINAL 13 COLONIES</span>
+</div>
+
+<!-- Game area -->
+<div id="game-area">
+    <div id="grid"></div>
+    <div id="start-prompt" style="display:none">Press any arrow key to begin!</div>
+    <div id="controls-hint">
+        Arrow keys to move &nbsp;·&nbsp; <b>Space / Enter</b> to munch &nbsp;·&nbsp; Avoid Dr. Bailey!
+    </div>
+</div>
+
+<!-- Level Complete overlay -->
+<div class="overlay" id="ov-level" style="display:none">
+    <div class="overlay-panel">
+        <div class="ov-emoji">🎉</div>
+        <div class="ov-title" id="lc-title">Level Clear!</div>
+        <div class="ov-sub">Score: <span class="ov-score" id="lc-score">0</span></div>
+        <div class="ov-sub">Next challenge:</div>
+        <div class="ov-next" id="lc-next"></div>
+        <button class="btn btn-green" id="btn-next">Next Level →</button>
+    </div>
+</div>
+
+<!-- Game Over overlay -->
+<div class="overlay" id="ov-gameover" style="display:none">
+    <div class="overlay-panel">
+        <div class="ov-emoji">💀</div>
+        <div class="ov-title">Game Over</div>
+        <div class="ov-sub" id="go-level">Reached Level 1</div>
+        <div class="ov-score" id="go-score">0</div>
+        <div class="btn-row">
+            <button class="btn btn-green" id="btn-again">Play Again</button>
+            <button class="btn btn-dim"   id="btn-back">← Back</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+'use strict';
+
+// ── Constants ──────────────────────────────────────────────────────────────
+const COLS = 6, ROWS = 5, CELL_COUNT = 30;
+const START = { row: 2, col: 0 };
+
+// ── Challenge Data ─────────────────────────────────────────────────────────
+const CHALLENGES = [
+    {
+        pfx: 'Select the',
+        lbl: 'ORIGINAL 13 COLONIES',
+        all: [
+            {t:'Virginia',c:1},{t:'Massachusetts',c:1},{t:'New Hampshire',c:1},
+            {t:'Maryland',c:1},{t:'Connecticut',c:1},{t:'Rhode Island',c:1},
+            {t:'Delaware',c:1},{t:'N. Carolina',c:1},{t:'S. Carolina',c:1},
+            {t:'New York',c:1},{t:'New Jersey',c:1},{t:'Pennsylvania',c:1},
+            {t:'Georgia',c:1},
+            {t:'Ohio',c:0},{t:'Kentucky',c:0},{t:'Tennessee',c:0},
+            {t:'Vermont',c:0},{t:'Maine',c:0},{t:'Alabama',c:0},
+            {t:'Louisiana',c:0},{t:'Indiana',c:0},{t:'Mississippi',c:0},
+            {t:'Illinois',c:0},{t:'Missouri',c:0},{t:'Michigan',c:0},
+            {t:'Florida',c:0},{t:'Arkansas',c:0},{t:'Texas',c:0},
+            {t:'Iowa',c:0},{t:'California',c:0}
+        ]
+    },
+    {
+        pfx: 'Select states that',
+        lbl: 'SECEDED FROM THE UNION',
+        all: [
+            {t:'S. Carolina',c:1},{t:'Mississippi',c:1},{t:'Florida',c:1},
+            {t:'Alabama',c:1},{t:'Georgia',c:1},{t:'Louisiana',c:1},
+            {t:'Texas',c:1},{t:'Virginia',c:1},{t:'Arkansas',c:1},
+            {t:'Tennessee',c:1},{t:'N. Carolina',c:1},
+            {t:'Missouri',c:0},{t:'Kentucky',c:0},{t:'Maryland',c:0},
+            {t:'Delaware',c:0},{t:'Ohio',c:0},{t:'Indiana',c:0},
+            {t:'Illinois',c:0},{t:'Pennsylvania',c:0},{t:'New York',c:0},
+            {t:'New Jersey',c:0},{t:'Connecticut',c:0},{t:'Massachusetts',c:0},
+            {t:'Rhode Island',c:0},{t:'Vermont',c:0},{t:'Maine',c:0},
+            {t:'California',c:0},{t:'Oregon',c:0},{t:'Iowa',c:0},
+            {t:'Minnesota',c:0},{t:'Wisconsin',c:0}
+        ]
+    },
+    {
+        pfx: 'Select the',
+        lbl: 'FORMER SOVIET REPUBLICS',
+        all: [
+            {t:'Russia',c:1},{t:'Ukraine',c:1},{t:'Belarus',c:1},
+            {t:'Georgia',c:1},{t:'Armenia',c:1},{t:'Azerbaijan',c:1},
+            {t:'Kazakhstan',c:1},{t:'Uzbekistan',c:1},{t:'Turkmenistan',c:1},
+            {t:'Tajikistan',c:1},{t:'Kyrgyzstan',c:1},{t:'Moldova',c:1},
+            {t:'Latvia',c:1},{t:'Lithuania',c:1},{t:'Estonia',c:1},
+            {t:'Poland',c:0},{t:'Hungary',c:0},{t:'Romania',c:0},
+            {t:'Bulgaria',c:0},{t:'Yugoslavia',c:0},{t:'Albania',c:0},
+            {t:'Cuba',c:0},{t:'China',c:0},{t:'Vietnam',c:0},
+            {t:'Finland',c:0},{t:'Turkey',c:0},{t:'Austria',c:0},
+            {t:'Greece',c:0},{t:'Norway',c:0},{t:'Sweden',c:0}
+        ]
+    },
+    {
+        pfx: 'Select the',
+        lbl: 'FOUNDING FATHERS',
+        all: [
+            {t:'Washington',c:1},{t:'Jefferson',c:1},{t:'Franklin',c:1},
+            {t:'Madison',c:1},{t:'Hamilton',c:1},{t:'J. Adams',c:1},
+            {t:'Jay',c:1},{t:'Monroe',c:1},{t:'Hancock',c:1},
+            {t:'Paine',c:1},{t:'P. Henry',c:1},{t:'Revere',c:1},
+            {t:'S. Adams',c:1},
+            {t:'Lincoln',c:0},{t:'Jackson',c:0},{t:'Polk',c:0},
+            {t:'Clay',c:0},{t:'Webster',c:0},{t:'Calhoun',c:0},
+            {t:'Harrison',c:0},{t:'Lee',c:0},{t:'Davis',c:0},
+            {t:'Grant',c:0},{t:'Sherman',c:0},{t:'Sheridan',c:0},
+            {t:'Buchanan',c:0},{t:'Pierce',c:0},{t:'Fillmore',c:0},
+            {t:'Taylor',c:0},{t:'Tyler',c:0}
+        ]
+    },
+    {
+        pfx: 'Select',
+        lbl: 'NEW DEAL PROGRAMS',
+        all: [
+            {t:'CCC',c:1},{t:'TVA',c:1},{t:'WPA',c:1},
+            {t:'FDIC',c:1},{t:'SSA',c:1},{t:'SEC',c:1},
+            {t:'AAA',c:1},{t:'PWA',c:1},{t:'NRA',c:1},
+            {t:'FHA',c:1},{t:'REA',c:1},{t:'FERA',c:1},
+            {t:'NATO',c:0},{t:'CIA',c:0},{t:'NSA',c:0},
+            {t:'DEA',c:0},{t:'EPA',c:0},{t:'FDA',c:0},
+            {t:'IRS',c:0},{t:'HUD',c:0},{t:'NAFTA',c:0},
+            {t:'SEATO',c:0},{t:'OPEC',c:0},{t:'AFL',c:0},
+            {t:'IWW',c:0},{t:'NAACP',c:0},{t:'FBI',c:0},
+            {t:'AARP',c:0},{t:'ACLU',c:0},{t:'IMF',c:0}
+        ]
+    },
+    {
+        pfx: 'Select',
+        lbl: 'WWI ALLIED POWERS',
+        all: [
+            {t:'France',c:1},{t:'Britain',c:1},{t:'Russia',c:1},
+            {t:'USA',c:1},{t:'Italy',c:1},{t:'Belgium',c:1},
+            {t:'Serbia',c:1},{t:'Romania',c:1},{t:'Greece',c:1},
+            {t:'Japan',c:1},{t:'Portugal',c:1},{t:'Montenegro',c:1},
+            {t:'Brazil',c:1},
+            {t:'Germany',c:0},{t:'Austria',c:0},{t:'Ottoman Empire',c:0},
+            {t:'Bulgaria',c:0},{t:'Mexico',c:0},{t:'Spain',c:0},
+            {t:'Sweden',c:0},{t:'Netherlands',c:0},{t:'Denmark',c:0},
+            {t:'Switzerland',c:0},{t:'Argentina',c:0},{t:'Norway',c:0},
+            {t:'Cuba',c:0},{t:'Persia',c:0},{t:'China',c:0},
+            {t:'Thailand',c:0},{t:'Chile',c:0}
+        ]
+    },
+    {
+        pfx: 'Select',
+        lbl: 'UNION GENERALS (Civil War)',
+        all: [
+            {t:'Grant',c:1},{t:'Sherman',c:1},{t:'Sheridan',c:1},
+            {t:'McClellan',c:1},{t:'Burnside',c:1},{t:'Meade',c:1},
+            {t:'Hooker',c:1},{t:'Thomas',c:1},{t:'Pope',c:1},
+            {t:'Rosecrans',c:1},{t:'McDowell',c:1},{t:'Hancock',c:1},
+            {t:'Lee',c:0},{t:'T. Jackson',c:0},{t:'Longstreet',c:0},
+            {t:'Stuart',c:0},{t:'A.P. Hill',c:0},{t:'Hood',c:0},
+            {t:'Beauregard',c:0},{t:'Johnston',c:0},{t:'Early',c:0},
+            {t:'Bragg',c:0},{t:'Forrest',c:0},{t:'Pemberton',c:0},
+            {t:'Polk',c:0},{t:'Morgan',c:0},{t:'Price',c:0},
+            {t:'Hardee',c:0},{t:'Buckner',c:0},{t:'Floyd',c:0}
+        ]
+    },
+    {
+        pfx: 'Select',
+        lbl: 'COLD WAR PRESIDENTS',
+        all: [
+            {t:'Truman',c:1},{t:'Eisenhower',c:1},{t:'Kennedy',c:1},
+            {t:'LBJ',c:1},{t:'Nixon',c:1},{t:'Ford',c:1},
+            {t:'Carter',c:1},{t:'Reagan',c:1},{t:'Bush Sr.',c:1},
+            {t:'FDR',c:0},{t:'Hoover',c:0},{t:'Harding',c:0},
+            {t:'Coolidge',c:0},{t:'Wilson',c:0},{t:'Taft',c:0},
+            {t:'T. Roosevelt',c:0},{t:'McKinley',c:0},{t:'Cleveland',c:0},
+            {t:'B. Harrison',c:0},{t:'Arthur',c:0},{t:'Garfield',c:0},
+            {t:'Hayes',c:0},{t:'Grant',c:0},{t:'Lincoln',c:0},
+            {t:'Buchanan',c:0},{t:'Pierce',c:0},{t:'Fillmore',c:0},
+            {t:'Taylor',c:0},{t:'Polk',c:0},{t:'Tyler',c:0}
+        ]
+    },
+    {
+        pfx: 'Select the',
+        lbl: 'GILDED AGE TYCOONS',
+        all: [
+            {t:'Rockefeller',c:1},{t:'Carnegie',c:1},{t:'J.P. Morgan',c:1},
+            {t:'Vanderbilt',c:1},{t:'Gould',c:1},{t:'Fisk',c:1},
+            {t:'Armour',c:1},{t:'Swift',c:1},{t:'Pullman',c:1},
+            {t:'Stanford',c:1},{t:'Frick',c:1},{t:'Harriman',c:1},
+            {t:'Debs',c:0},{t:'Bryan',c:0},{t:'Gompers',c:0},
+            {t:'Addams',c:0},{t:'Tarbell',c:0},{t:'Riis',c:0},
+            {t:'Stanton',c:0},{t:'Anthony',c:0},{t:'Powderly',c:0},
+            {t:'La Follette',c:0},{t:'Weaver',c:0},{t:'Twain',c:0},
+            {t:'Edison',c:0},{t:'Bell',c:0},{t:'Grant',c:0},
+            {t:'Cleveland',c:0},{t:'Hayes',c:0},{t:'Garfield',c:0}
+        ]
+    },
+    {
+        pfx: 'Select',
+        lbl: 'WWII AXIS POWERS',
+        all: [
+            {t:'Germany',c:1},{t:'Japan',c:1},{t:'Italy',c:1},
+            {t:'Hungary',c:1},{t:'Romania',c:1},{t:'Bulgaria',c:1},
+            {t:'Finland',c:1},{t:'Slovakia',c:1},{t:'Croatia',c:1},
+            {t:'Thailand',c:1},{t:'Vichy France',c:1},{t:'Iraq (1941)',c:1},
+            {t:'USA',c:0},{t:'Britain',c:0},{t:'USSR',c:0},
+            {t:'Free France',c:0},{t:'China',c:0},{t:'Canada',c:0},
+            {t:'Australia',c:0},{t:'India',c:0},{t:'Poland',c:0},
+            {t:'Yugoslavia',c:0},{t:'Greece',c:0},{t:'Belgium',c:0},
+            {t:'Netherlands',c:0},{t:'Norway',c:0},{t:'Mexico',c:0},
+            {t:'Brazil',c:0},{t:'Ethiopia',c:0},{t:'Philippines',c:0}
+        ]
+    },
+    {
+        pfx: 'Select',
+        lbl: 'PROGRESSIVE ERA REFORMERS',
+        all: [
+            {t:'T. Roosevelt',c:1},{t:'Wilson',c:1},{t:'La Follette',c:1},
+            {t:'Addams',c:1},{t:'Tarbell',c:1},{t:'Riis',c:1},
+            {t:'Stanton',c:1},{t:'Anthony',c:1},{t:'Debs',c:1},
+            {t:'Bryan',c:1},{t:'Gompers',c:1},{t:'Sinclair',c:1},
+            {t:'Brandeis',c:1},
+            {t:'Rockefeller',c:0},{t:'Carnegie',c:0},{t:'J.P. Morgan',c:0},
+            {t:'Vanderbilt',c:0},{t:'Gould',c:0},{t:'Fisk',c:0},
+            {t:'Pullman',c:0},{t:'Frick',c:0},{t:'Stanford',c:0},
+            {t:'Tweed',c:0},{t:'Blaine',c:0},{t:'Reed',c:0},
+            {t:'Hanna',c:0},{t:'Aldrich',c:0},{t:'Cannon',c:0},
+            {t:'Platt',c:0},{t:'Conkling',c:0}
+        ]
+    },
+    {
+        pfx: 'Select',
+        lbl: 'ABOLITIONISTS',
+        all: [
+            {t:'Garrison',c:1},{t:'Douglass',c:1},{t:'Truth',c:1},
+            {t:'Tubman',c:1},{t:'J. Brown',c:1},{t:'Stowe',c:1},
+            {t:'Weld',c:1},{t:'Birney',c:1},{t:'Phillips',c:1},
+            {t:'Child',c:1},{t:'Lovejoy',c:1},{t:'Tappan',c:1},
+            {t:'Calhoun',c:0},{t:'Davis',c:0},{t:'Stephens',c:0},
+            {t:'Rhett',c:0},{t:'Yancey',c:0},{t:'Toombs',c:0},
+            {t:'Hayne',c:0},{t:'Hammond',c:0},{t:'Fitzhugh',c:0},
+            {t:'Tucker',c:0},{t:'Dew',c:0},{t:'Harper',c:0},
+            {t:'Cobb',c:0},{t:'Wigfall',c:0},{t:'Mason',c:0},
+            {t:'Hunter',c:0},{t:'Pryor',c:0},{t:'Miles',c:0}
+        ]
+    }
+];
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function posToIdx(p)   { return p.row * COLS + p.col; }
+function idxToPos(i)   { return { row: Math.floor(i / COLS), col: i % COLS }; }
+function posEq(a, b)   { return a.row === b.row && a.col === b.col; }
+
+function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function generateGrid(chal) {
+    const correct   = chal.all.filter(x => x.c);
+    const incorrect = chal.all.filter(x => !x.c);
+    const nCorrect  = Math.min(6, correct.length);
+    const cells = [];
+    for (let i = 0; i < nCorrect; i++)
+        cells.push({ ...correct[Math.floor(Math.random() * correct.length)] });
+    for (let i = 0; i < CELL_COUNT - nCorrect; i++)
+        cells.push({ ...incorrect[Math.floor(Math.random() * incorrect.length)] });
+    return shuffle(cells);
+}
+
+// ── DOM refs ───────────────────────────────────────────────────────────────
+const gridEl        = document.getElementById('grid');
+const flashEl       = document.getElementById('flash-overlay');
+const hudScore      = document.getElementById('hud-score');
+const hudLives      = document.getElementById('hud-lives');
+const hudLevel      = document.getElementById('hud-level');
+const chalPfx       = document.getElementById('chal-pfx');
+const chalLbl       = document.getElementById('chal-lbl');
+const startPrompt   = document.getElementById('start-prompt');
+const ovLevel       = document.getElementById('ov-level');
+const ovGameover    = document.getElementById('ov-gameover');
+
+// ── State ──────────────────────────────────────────────────────────────────
+let grid, playerPos, enemies;
+let score, lives, level, chalIdx;
+let gameStatus, invincible, started;
+let enemyTimer = null, flashTimer = null;
+
+// ── Flash ──────────────────────────────────────────────────────────────────
+function setFlash(type, ms) {
+    flashEl.style.backgroundColor =
+        type === 'correct' ? 'rgba(16,185,129,.12)' :
+        type === 'wrong'   ? 'rgba(239,68,68,.18)'  : 'transparent';
+    clearTimeout(flashTimer);
+    if (ms) flashTimer = setTimeout(() => { flashEl.style.backgroundColor = 'transparent'; }, ms);
+}
+
+// ── HUD ────────────────────────────────────────────────────────────────────
+function updateHUD() {
+    hudScore.textContent = score;
+    hudLevel.textContent = level;
+    hudLives.textContent = '❤️'.repeat(lives) + '🖤'.repeat(Math.max(0, 3 - lives));
+}
+
+// ── Build Level ────────────────────────────────────────────────────────────
+function buildLevel(lvl, ci, curLives, curScore) {
+    clearInterval(enemyTimer);
+
+    const chal = CHALLENGES[ci % CHALLENGES.length];
+    grid        = generateGrid(chal);
+    playerPos   = { ...START };
+    score       = curScore;
+    lives       = curLives;
+    level       = lvl;
+    chalIdx     = ci;
+    gameStatus  = 'playing';
+    invincible  = false;
+    started     = false;
+
+    chalPfx.textContent = chal.pfx + ' ';
+    chalLbl.textContent = chal.lbl;
+
+    // Spawn enemies: 1 at level 1, +1 every 3 levels, max 4
+    const count  = Math.min(1 + Math.floor((lvl - 1) / 3), 4);
+    const taken  = new Set([posToIdx(START)]);
+    enemies = [];
+    for (let i = 0; i < count; i++) {
+        let idx;
+        do { idx = Math.floor(Math.random() * CELL_COUNT); } while (taken.has(idx));
+        taken.add(idx);
+        enemies.push({ id: i, pos: idxToPos(idx) });
+    }
+
+    ovLevel.style.display    = 'none';
+    ovGameover.style.display = 'none';
+    startPrompt.style.display = 'block';
+
+    updateHUD();
+    render();
+}
+
+// ── Enemy tick ─────────────────────────────────────────────────────────────
+function startEnemyTimer() {
+    clearInterval(enemyTimer);
+    const speed = Math.max(350, 950 - (level - 1) * 40);
+    enemyTimer = setInterval(tickEnemies, speed);
+}
+
+function tickEnemies() {
+    if (gameStatus !== 'playing') return;
+
+    const trackChance = Math.min(0.35 + (level - 1) * 0.04, 0.65);
+
+    enemies = enemies.map(enemy => {
+        const dirs = [
+            {row:-1,col:0},{row:1,col:0},{row:0,col:-1},{row:0,col:1}
+        ].filter(d => {
+            const r = enemy.pos.row + d.row, c = enemy.pos.col + d.col;
+            return r >= 0 && r < ROWS && c >= 0 && c < COLS;
+        });
+        if (!dirs.length) return enemy;
+
+        let dir;
+        if (Math.random() < trackChance) {
+            const dr = playerPos.row - enemy.pos.row;
+            const dc = playerPos.col - enemy.pos.col;
+            const toward = Math.abs(dr) >= Math.abs(dc)
+                ? { row: Math.sign(dr), col: 0 }
+                : { row: 0, col: Math.sign(dc) };
+            dir = dirs.find(d => d.row === toward.row && d.col === toward.col)
+                || dirs[Math.floor(Math.random() * dirs.length)];
+        } else {
+            dir = dirs[Math.floor(Math.random() * dirs.length)];
+        }
+        return { ...enemy, pos: { row: enemy.pos.row + dir.row, col: enemy.pos.col + dir.col } };
+    });
+
+    if (!invincible && enemies.some(e => posEq(e.pos, playerPos))) {
+        hitPlayer();
+    }
+    render();
+}
+
+// ── Player hit ─────────────────────────────────────────────────────────────
+function hitPlayer() {
+    const nl = lives - 1;
+    setFlash('wrong', nl > 0 ? 1500 : 0);
+    if (nl <= 0) {
+        lives = 0;
+        updateHUD();
+        gameStatus = 'gameOver';
+        clearInterval(enemyTimer);
+        render();
+        setTimeout(showGameOver, 500);
+    } else {
+        lives = nl;
+        invincible = true;
+        playerPos = { ...START };
+        updateHUD();
+        render();
+        setTimeout(() => { invincible = false; render(); }, 1500);
+    }
+}
+
+// ── Munch ──────────────────────────────────────────────────────────────────
+function munchCell() {
+    const idx  = posToIdx(playerPos);
+    const cell = grid[idx];
+    if (cell === null) return;
+
+    grid[idx] = null;
+
+    if (cell.c) {
+        score += 10;
+        setFlash('correct', 250);
+        updateHUD();
+        render();
+        if (!grid.some(c => c !== null && c.c)) {
+            gameStatus = 'levelComplete';
+            clearInterval(enemyTimer);
+            setTimeout(showLevelComplete, 350);
+        }
+    } else {
+        score = Math.max(0, score - 5);
+        const nl = lives - 1;
+        setFlash('wrong', nl > 0 ? 1100 : 0);
+        if (nl <= 0) {
+            lives = 0;
+            gameStatus = 'gameOver';
+            clearInterval(enemyTimer);
+            updateHUD();
+            render();
+            setTimeout(showGameOver, 600);
+        } else {
+            lives = nl;
+            invincible = true;
+            updateHUD();
+            render();
+            setTimeout(() => { invincible = false; render(); }, 1100);
+        }
+    }
+}
+
+// ── Overlays ───────────────────────────────────────────────────────────────
+function showLevelComplete() {
+    const nextChal = CHALLENGES[(chalIdx + 1) % CHALLENGES.length];
+    document.getElementById('lc-title').textContent = `Level ${level} Clear!`;
+    document.getElementById('lc-score').textContent = score;
+    document.getElementById('lc-next').textContent  = nextChal.lbl;
+    ovLevel.style.display = 'flex';
+}
+
+function showGameOver() {
+    document.getElementById('go-level').textContent = `Reached Level ${level}`;
+    document.getElementById('go-score').textContent = `Final Score: ${score}`;
+    ovGameover.style.display = 'flex';
+}
+
+document.getElementById('btn-next').addEventListener('click', () => {
+    buildLevel(level + 1, chalIdx + 1, lives, score);
+});
+document.getElementById('btn-again').addEventListener('click', () => {
+    buildLevel(1, 0, 3, 0);
+});
+document.getElementById('btn-back').addEventListener('click', () => {
+    window.location.href = 'index.html';
+});
+
+// ── Keyboard ───────────────────────────────────────────────────────────────
+document.addEventListener('keydown', function (e) {
+    const isArrow = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key);
+    const isMunch = e.key === ' ' || e.key === 'Enter';
+    if (!isArrow && !isMunch) return;
+    e.preventDefault();
+
+    if (!started) {
+        started = true;
+        startPrompt.style.display = 'none';
+        startEnemyTimer();
+        return;
+    }
+
+    if (gameStatus !== 'playing' || invincible) return;
+
+    if (isMunch) { munchCell(); return; }
+
+    // Movement
+    const { row, col } = playerPos;
+    let next = { row, col };
+    if (e.key === 'ArrowUp')    next = { row: Math.max(0, row - 1), col };
+    if (e.key === 'ArrowDown')  next = { row: Math.min(ROWS - 1, row + 1), col };
+    if (e.key === 'ArrowLeft')  next = { row, col: Math.max(0, col - 1) };
+    if (e.key === 'ArrowRight') next = { row, col: Math.min(COLS - 1, col + 1) };
+
+    if (enemies.some(en => posEq(en.pos, next))) {
+        hitPlayer();
+        return;
+    }
+
+    playerPos = next;
+    render();
+});
+
+// ── Render ─────────────────────────────────────────────────────────────────
+function render() {
+    gridEl.innerHTML = '';
+
+    grid.forEach((cell, idx) => {
+        const pos        = idxToPos(idx);
+        const isPlayer   = posEq(pos, playerPos);
+        const enemyHere  = enemies.find(e => posEq(e.pos, pos));
+        const isEmpty    = cell === null;
+
+        const div = document.createElement('div');
+        let cls = 'cell';
+        if (isEmpty)                    cls += ' empty';
+        if (isPlayer && !enemyHere)     cls += ' has-player';
+        div.className = cls;
+
+        // Text label
+        if (!isEmpty) {
+            const span = document.createElement('span');
+            span.className = 'cell-text';
+            span.textContent = cell.t;
+            if (isPlayer && !enemyHere && invincible) span.style.opacity = '.25';
+            div.appendChild(span);
+        }
+
+        // Player sprite (🧑‍🎓)
+        if (isPlayer && !enemyHere) {
+            const sp = document.createElement('div');
+            sp.className = 'player-sprite' + (invincible ? ' blink' : '');
+            sp.textContent = '🧑‍🎓';
+            div.appendChild(sp);
+        }
+
+        // Dr. Bailey enemy
+        if (enemyHere) {
+            const sp   = document.createElement('div');
+            sp.className = 'enemy-sprite';
+            const face = document.createElement('div');
+            face.className = 'enemy-face';
+            sp.appendChild(face);
+            div.appendChild(sp);
+        }
+
+        gridEl.appendChild(div);
+    });
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+buildLevel(1, 0, 3, 0);
+
+})();
+</script>
+</body>
+</html>
